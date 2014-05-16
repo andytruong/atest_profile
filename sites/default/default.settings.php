@@ -554,4 +554,3 @@ $conf['404_fast_html'] = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN"
 
 // Disable mail sending
 $conf['mail_system']['default-system'] = 'TestingMailSystem';
-
