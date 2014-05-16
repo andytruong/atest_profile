@@ -552,8 +552,5 @@ $conf['404_fast_html'] = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN"
  */
 # $conf['allow_authorize_operations'] = FALSE;
 
-// Autoload
-require_once DRUPAL_ROOT . '/sites/all/vendor/autoload.php';
-
 // Disable mail sending
 $conf['mail_system']['default-system'] = 'TestingMailSystem';
