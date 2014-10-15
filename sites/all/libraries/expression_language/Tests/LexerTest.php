@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ExpressionLanguage\Tests\Node;
+namespace Symfony\Component\ExpressionLanguage\Tests;
 
 use Symfony\Component\ExpressionLanguage\Lexer;
 use Symfony\Component\ExpressionLanguage\Token;
@@ -77,6 +77,14 @@ class LexerTest extends \PHPUnit_Framework_TestCase
             array(
                 array(new Token('operator', '..', 1)),
                 '..',
+            ),
+            array(
+                array(new Token('string', '#foo', 1)),
+                "'#foo'",
+            ),
+            array(
+                array(new Token('string', '#foo', 1)),
+                '"#foo"',
             ),
         );
     }
