@@ -15,7 +15,7 @@ var stylus = require('stylus');
 
 
 // keep reference to original lookup function of stylus
-var origLookup = stylus.utils.lookup;
+var origFind = stylus.utils.find;
 
 
 // resolves `<node_module>/path/name` pathnames
@@ -37,29 +37,29 @@ function resolvePath(file) {
 ////////////////////////////////////////////////////////////////////////////////
 
 
-module.exports = function (filename, options) {
+module.exports = function (filename) {
   var renderer,
       result,
       imports = [];
 
-  renderer = stylus(fs.readFileSync(filename, 'utf8'), _.extend({}, options, {
+  renderer = stylus(fs.readFileSync(filename, 'utf8'), {
     paths:    [ path.dirname(filename) ]
   , filename: filename
   , _imports: imports
-  }));
+  });
 
   // monkey-patch lookup with resolver
-  stylus.utils.lookup = function (lookupFile, lookupPaths, thisFilename) {
-    return origLookup(resolvePath(lookupFile), lookupPaths, thisFilename);
+  stylus.utils.find = function (lookupFile, lookupPaths, thisFilename) {
+    return origFind(resolvePath(lookupFile), lookupPaths, thisFilename);
   };
 
   // render stylus file and restore lookup function
   result = renderer.render();
-  stylus.utils.lookup = origLookup;
+  stylus.utils.find = origFind;
 
   return {
     css: result,
     // array of imported file names, including current one
-    imports: _.map(imports, function (entry) { return entry.filename; })
+    imports: _.map(imports, function (entry) { return entry.path; })
   };
 };

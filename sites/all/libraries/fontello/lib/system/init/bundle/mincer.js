@@ -6,6 +6,8 @@
 
 
 var crypto = require('crypto');
+var fs     = require('fs');
+var path   = require('path');
 
 
 var Mincer    = require('mincer');
@@ -43,9 +45,16 @@ module.exports = function (sandbox) {
   //
   // rebuild assets on config change:
   //
-  // - track `bundle.yml` in ALL apps
+  // - track `bundle.yml` in all apps (via sandbox.config.packages)
+  // - track `package.json` in all apps
   //
-  environment.version = md5(JSON.stringify(sandbox.config.packages));
+  var unique = JSON.stringify(sandbox.config.packages);
+
+  N.runtime.apps.forEach(function (app) {
+    unique += fs.readFileSync(path.join(app.root, 'package.json'), 'utf-8');
+  });
+
+  environment.version = md5(unique);
 
   //
   // Enable autoprefixer
@@ -54,13 +63,20 @@ module.exports = function (sandbox) {
     'android >= 2.2',
     'bb >= 7',
     'chrome >= 26',
-    'ff >= 17',
-    'ie >= 8',
+    'ff >= 24',
+    'ie >= 9',
     'ios >= 5',
     'opera >= 12',
     'safari >= 5'
   ]);
   environment.enable('autoprefixer');
+
+
+  //
+  // Enable source maps support. Need future work.
+  //
+  //environment.enable('source_maps');
+
 
   //
   // Provide some helpers to EJS and Stylus
@@ -82,6 +98,12 @@ module.exports = function (sandbox) {
   //
 
   environment.registerHelper('jetson', require('../../jetson').serialize);
+
+  //
+  // Expose N helper
+  //
+
+  environment.registerHelper('N', N);
 
 
   sandbox.assets = {

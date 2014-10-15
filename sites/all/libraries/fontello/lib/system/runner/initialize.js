@@ -20,6 +20,8 @@ var yaml        = require('js-yaml');
 // internal
 var Application = require('./application');
 var Wire        = require('../wire');
+var stopwatch   = require('../init/utils/stopwatch');
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -195,9 +197,7 @@ function initScope(N) {
    **/
   N.validate.test = function (apiPath, params) {
     if (validationSchemas[apiPath]) {
-      return revalidator.validate(params, validationSchemas[apiPath], {
-        cast: false
-      });
+      return revalidator.validate(params, validationSchemas[apiPath]);
     }
 
     return null;
@@ -532,6 +532,12 @@ module.exports = function (N) {
   initScope(N);
   initConfig(N);
   initLogger(N);
+
+  N.logger.info('Loaded config files', N.__startupTimer.elapsed);
+  var timer = stopwatch();
+
   checkConfig(N);
   initApps(N);
+
+  N.logger.info('Applications intialized', timer.elapsed);
 };

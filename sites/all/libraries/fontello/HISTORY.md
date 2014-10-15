@@ -1,3 +1,14 @@
+5.2.0 / 2014.06.22
+------------------
+
+- FontAwesome update to 4.1.0
+- Added font version display if exists
+- Other minor fonts updates
+- Nodeca core sync
+- Dependencies update
+- Removed security headers due cross issues
+
+
 5.1.0 / 2014-02-18
 ------------------
 

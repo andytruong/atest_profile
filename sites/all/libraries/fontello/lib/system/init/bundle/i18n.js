@@ -19,7 +19,6 @@ var yaml      = require('js-yaml');
 
 // internal
 var stopwatch = require('../utils/stopwatch');
-var jetson    = require('../../jetson');
 var findPaths = require('./utils/find_paths');
 
 
@@ -137,8 +136,10 @@ module.exports = function (sandbox) {
 
   // Correct the application config if needed and initialize BabelFishes.
   initLocalesConfig(N, knownLocales);
-  serverI18n = new BabelFish(N.config.locales['default']);
-  clientI18n = new BabelFish(N.config.locales['default']);
+  // Fallback locale != default locale.
+  // We use 'en-US' because it should always contain all phrases.
+  serverI18n = new BabelFish('en-US');
+  clientI18n = new BabelFish('en-US');
 
   _.forEach(serverI18nAccum, function (data) {
     serverI18n.addPhrase(data.locale, data.apiPath, data.phrases);
@@ -159,7 +160,7 @@ module.exports = function (sandbox) {
 
       result = WRAPPER_TEMPLATE({
         locale: locale
-      , data:   jetson.serialize(clientI18n.getCompiledData(locale))
+      , data:   clientI18n.stringify(locale)
       });
 
       fs.writeFileSync(outfile, result, 'utf8');

@@ -20,6 +20,7 @@ var resolveModulePath = require('./resolve_module_path');
 var RESOURCE_NAMES = [
   'bin'
 , 'server'
+, 'internal'
 , 'client'
 , 'views'
 , 'styles'
@@ -126,7 +127,20 @@ function normalizeResource(app, pkgName, config) {
   }
 
   ['include', 'exclude'].forEach(function (filter) {
-    result[filter] = result[filter].concat(config[filter]);
+    // coerce patterns to array
+    var val = config[filter];
+
+    if (!val) {
+      result[filter] = [];
+      return;
+    }
+
+    if (_.isArray(val)) {
+      result[filter] = val.slice();
+      return;
+    }
+
+    result[filter] = [val];
   });
 
   return result;

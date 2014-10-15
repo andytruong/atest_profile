@@ -62,9 +62,8 @@ function prepareParams(obj) {
       clean[key].match = new RegExp(val.match);
     }
 
-    if (undefined !== val['default']) {
-      clean[key]['default'] = val['default'];
-    }
+    if (undefined !== val.default) { clean[key].default = val.default; }
+    if (undefined !== val.type) { clean[key].type = val.type; }
   });
 
   return clean;
@@ -163,7 +162,7 @@ function prepareMountingConfig(config) {
 
 // Helper to find a mount point for a given apiPath.
 //
-function findMountPoint(apiPath) {
+function findMountPoint(N, apiPath) {
   var options;
 
   do {
@@ -203,7 +202,7 @@ module.exports = function (sandbox) {
     }
 
     _.forEach(serverMethods, function (routes, apiPath) {
-      var mount = findMountPoint(apiPath);
+      var mount = findMountPoint(N, apiPath);
 
       // Single slash means no mount point (default mount point).
       if ('/' === mount) {

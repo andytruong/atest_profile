@@ -23,6 +23,7 @@ var async  = require('async');
 
 // internal
 var Application = require('./runner/application');
+var stopwatch   = require('./init/utils/stopwatch');
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,13 +62,15 @@ function formatError(err) {
 exports.bootstrap = function (options) {
   var N, faultLoggerDomain, faultLoggerQueue;
 
-  N = global.N = {
+  N = /**global.N**/ {
     io:       require('./io'),
     runtime:  {
       args:     process.argv.slice(2),
       mainApp:  new Application(options)
     }
   };
+
+  N.__startupTimer = stopwatch();
 
   //
   // Domain for logging 'low-level' errors, logger errors safe, so that if logger

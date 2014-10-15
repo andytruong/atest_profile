@@ -350,9 +350,9 @@ module.exports = function (sandbox) {
 
   // XXX Set Mincer compression here, to avoid double compression on creating
   //     package files (client.js).
-  if ('development' !== N.runtime.env) {
+  if ('development' !== N.runtime.env && process.env.NODECA_NOMINIFY !== '1') {
     sandbox.assets.environment.jsCompressor  = 'uglify';
-    sandbox.assets.environment.cssCompressor = 'csso';
+    sandbox.assets.environment.cssCompressor = 'csswring';
   }
 
   fstools.mkdirSync(bndlDir);

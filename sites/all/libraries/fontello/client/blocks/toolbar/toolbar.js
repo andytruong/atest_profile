@@ -184,6 +184,17 @@ N.wire.once('navigate.done', function (data) {
   //
   // Initialize Twitter Bootstrap typeahead plugin
   //
+
+  /*global Bloodhound*/
+  // constructs the suggestion engine
+  var keywords = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    // `states` is an array of state names defined in "The Basics"
+    local: $.map(knownKeywords, function(keyword) { return { value: keyword }; })
+  });
+  keywords.initialize();
+
   $('#search')
     .on('change input keyup typeahead:selected', function () {
       N.app.searchWord($.trim($(this).val()));
@@ -195,12 +206,16 @@ N.wire.once('navigate.done', function (data) {
         N.app.searchWord('');
       }
     })
-    /*.on('focus keyup', _.debounce(function () {
-      $(this).typeahead('hide');
-    }, 3000))*/
     .typeahead({
-      name:  'search',
-      local: knownKeywords
+      hint: true,
+      highlight: true,
+      minLength: 1
+    }, {
+      name: 'keywords',
+      displayKey: 'value',
+      // `ttAdapter` wraps the suggestion engine in an adapter that
+      // is compatible with the typeahead jQuery plugin
+      source: keywords.ttAdapter()
     })
     .focus();
 
