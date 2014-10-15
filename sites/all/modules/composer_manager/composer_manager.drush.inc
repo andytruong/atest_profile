@@ -73,12 +73,14 @@ function drush_composer_manager($command = 'install') {
     // Clear the caches by reloading the available command files.
     _drush_find_commandfiles(DRUSH_BOOTSTRAP_DRUSH);
   }
-
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    $dir = str_replace('\\', '/', $dir);
+  }
   // Generate the command arguments to pass to Drush Composer.
   $drush_arguments = drush_get_arguments();
   if ($drush_arguments && $drush_arguments[0] === 'composer-manager') {
     $arguments = $drush_arguments;
-    array_shift($arguments); // exclude drush main command, composer-manager 
+    array_shift($arguments); // exclude drush main command, composer-manager
     $arguments[] = '--working-dir=' . escapeshellcmd($dir);
   }
   else {
@@ -91,9 +93,13 @@ function drush_composer_manager($command = 'install') {
     );
   }
 
-  # drush_print_r($arguments); return;
+  $composer_result = drush_invoke('composer', $arguments);
+  // Allow modules to perform post-composer install tasks.
+  if ($command == 'install' || $command == 'update') {
+    module_invoke_all('composer_dependencies_install');
+  }
 
-  return drush_invoke('composer', $arguments);
+  return $composer_result;
 }
 
 /**
@@ -117,31 +123,6 @@ function drush_composer_manager_composer_json_rebuild() {
  */
 function drush_composer_manager_post_pm_enable() {
   drush_composer_manager_write_if_changed();
-}
-
-/**
- * Implements drush_hook_COMMAND_pre_validate()
- */
-function drush_composer_manager_pm_enable_pre_validate($module) {
-  $module_composer = drupal_get_path('module', $module) . '/composer.json';
-  if (is_file($module_composer)) {
-    if ($module_data = json_decode(file_get_contents($module_composer))) {
-      if (!lock_acquire('composer_manager_write_file', 10)) {
-        return FALSE;
-      }
-
-      require_once __DIR__ . '/composer_manager.writer.inc';
-      $json = composer_manager_fetch_data();
-      $json[$module] = $module_data;
-      
-      $dir_uri = variable_get('composer_manager_file_dir', file_default_scheme() . '://composer');
-      composer_manager_put_file($dir_uri, $json);
-      
-      lock_release('composer_manager_write_file');
-      
-      drush_composer_manager('update');
-    }
-  }
 }
 
 /**
