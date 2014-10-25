@@ -1,0 +1,5 @@
+modules/*/tests   export-ignore
+*.txt             export-ignore
+themes/garland    export-ignore
+themes/stark      export-ignore
+profiles/standard export-ignore
